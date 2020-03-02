@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      textarea {
+        resize: horizontal;
+        width: 500px;
+      }
+      .input {
+        display: block;
+        margin: 30px;
+        color: #353535;
+        font-size: 20px;
+      }
+      #getNum {
+        width: 400px;
+      }
+      #container {
+        display: flex;
+      }
+      .box {
+        margin: 10px;
+        width: 200px;
+        text-align: center;
+        border: 1px solid #e9e9e9;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>吃鸡小分队</h1>
+    <main id="container"></main>
+    <textarea id="getMember" class="input" name="" id="" cols="30" rows="10" placeholder="请填入成员名字，多个名字之间以英文逗号(,)隔开"></textarea>
+    <input id="getNum" class="input" type="number" name="" id="" placeholder="请选择每组成员数，默认为每组4人" />
+    <span class="input">注：若每组人数不能平均分配，最后一个小组会少相应人数。例：共10人，每组分4人，最终分配为3个组，前2个组均为4人，最后一组为2人</span>
+    <button id="btn" class="input">开始随机分组</button>
+  </body>
+  <script>
+    let obj = {
+      dom: {
+        container: document.getElementById("container"),
+        getMember: document.getElementById("getMember"),
+        getNum: document.getElementById("getNum"),
+        btn: document.getElementById("btn")
+      },
+      data: {
+        allMember: ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"],
+        group: {}
+      },
+      init() {
+        this.submit();
+      },
+      template(groupNo, member) {
+        let node = `<div class="box">
+            <h2>${groupNo}组</h2>`;
+        for (let i of member) {
+          node += `<p>${i}</p>`;
+        }
+        node += `</div>`;
+        return node;
+      },
+      render() {
+        let node = "";
+        for (let i in this.data.group) {
+          node += this.template(i, this.data.group[i]);
+        }
+        this.dom.container.innerHTML = node;
+      },
+      sort(allMember, numPerGroup = 4) {
+        let no = 1,
+          tempArr = [],
+          originalLength = allMember.length;
+        for (let i = 1; i <= originalLength; i++) {
+          let curLength = allMember.length - 1,
+            random = Math.floor(Math.random() * curLength),
+            less = curLength % numPerGroup;
+          tempArr.push(allMember[random]);
+          allMember.splice(random, 1);
+          if (tempArr.length === numPerGroup) {
+            this.data.group[`${no}组`] = tempArr;
+            no++;
+            tempArr = [];
+          }
+          if (i > originalLength - less) {
+            tempArr.push(allMember[random]);
+            allMember.splice(random, 1);
+          }
+        }
+        this.data.group[`${no}组`] = tempArr;
+      },
+      submit() {
+        this.dom.btn.onclick = () => {
+          let allMember = this.dom.getMember.value.split(",");
+          let numPerGroup = this.dom.getNum.value;
+          this.sort(allMember, numPerGroup || 4);
+          this.render();
+        };
+      }
+    };
+    window.onload = function() {
+      obj.init();
+    };
+  </script>
+</html>
