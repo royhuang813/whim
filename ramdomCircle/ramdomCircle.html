@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
+    <style>
+      .cir {
+        position: absolute;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #fff;
+        font-weight: bold;
+        border-radius: 100%;
+        box-shadow: 0px 0px 10px 10px #33333330;
+        overflow: hidden;
+      }
+      #section {
+        position: relative;
+        margin: 200px 0 0 100px;
+      }
+      .speedNum {
+        padding: 0 20px 0 0;
+        color: #dd0000;
+        font-size: 20px;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <label for="creSpeed">创建圆速度：</label>
+      <input type="range" name="creSpeed" id="creSpeed" min="1" max="20" step="1" value="1" />
+      <span id="creSpeedNum" class="speedNum">20</span>
+      <button id="pauseOrCon" data-id="pause" type="button">暂停</button>
+      <button id="reset" type="button">重置</button>
+    </header>
+    <section id="section" style="width: 1700px; height: 500px;"></section>
+    <script>
+      //公共随机函数
+      function random(end, start = 0) {
+        return Math.floor(Math.random() * end + start);
+      }
+      let obj = {
+        //常用变量
+        value: {
+          scale: 4, //每次放大值
+          maxWidth: 300, //圆最大值
+          scaleSpeed: 16, ////控制圆放大速度，越小越快
+          creEleSpeed: 1, //创建新元素的速度，越小越快
+          eleBaseSpeed: 1, //创建新元素基础速度
+          intervalId: null
+        },
+        //画板面积
+        area: {
+          width: parseInt(section.style.width), //限制范围 宽
+          height: parseInt(section.style.height) //限制范围 高
+        },
+        //弹幕
+        word: ["苹果", "梨子", "葡萄", "西瓜", "草莓", "橘子", "香蕉", "草莓"],
+        //初始化
+        init() {
+          this.changeSpeed();
+          this.interval();
+          this.pause();
+          this.reset();
+        },
+        //重置
+        reset() {
+          reset.onclick = function() {
+            while (section.hasChildNodes()) {
+              section.removeChild(section.firstChild);
+            }
+          };
+        },
+        //暂停
+        pause() {
+          const that = this;
+          pauseOrCon.onclick = function() {
+            let id = pauseOrCon.getAttribute("data-id");
+            //若当前按钮功能是'暂停'
+            if (id === "pause") {
+              clearInterval(that.value.intervalId);
+              pauseOrCon.innerText = "继续";
+              pauseOrCon.setAttribute("data-id", "continue");
+            }
+            //若当前按钮功能是'继续'
+            if (id === "continue") {
+              that.interval();
+              pauseOrCon.innerText = "暂停";
+              pauseOrCon.setAttribute("data-id", "pause");
+            }
+          };
+        },
+        //监听input range值，并改变创建圆速度
+        changeSpeed() {
+          const that = this;
+          creSpeed.oninput = function() {
+            that.value.creEleSpeed = this.value;
+            creSpeedNum.innerText = 21 - this.value;
+          };
+        },
+        //移除最大圆
+        rm() {
+          let divsArr = document.getElementsByTagName("div"),
+            mW = this.value.maxWidth;
+          for (let i of divsArr) {
+            let w = parseInt(i.style.width);
+            if (w >= mW) {
+              i.remove();
+            }
+          }
+        },
+        //放大圆
+        scale() {
+          let divsArr = document.getElementsByTagName("div");
+          for (let i of divsArr) {
+            let s = this.value.scale,
+              w = parseInt(i.style.width),
+              h = parseInt(i.style.height),
+              l = parseInt(i.style.left),
+              t = parseInt(i.style.top),
+              wS = parseInt(i.style.fontSize);
+            i.style.width = `${(w += s)}px`;
+            i.style.height = `${(h += s)}px`;
+            i.style.left = `${(l -= s / 2)}px`;
+            i.style.top = `${(t -= s / 2)}px`;
+            i.style.fontSize = `${(wS += 1)}px`;
+          }
+        },
+        //控制创建新元素
+        isTimeCre() {
+          return this.value.eleBaseSpeed++ % this.value.creEleSpeed === 0;
+        },
+        //随机定位
+        ranPst() {
+          let { width, height } = this.area;
+          return [random(width), random(height)];
+        },
+        //随机颜色
+        ranColor() {
+          return `${random(255)},${random(255)},${random(255)}`;
+        },
+        //创建元素
+        cre() {
+          let rgb = this.ranColor(),
+            [l, t] = this.ranPst(),
+            newD = document.createElement("div");
+          newD.setAttribute("class", "cir");
+          newD.style.backgroundColor = `rgb(${rgb})`;
+          newD.style.left = `${l}px`;
+          newD.style.top = `${t}px`;
+          newD.style.width = `0px`;
+          newD.style.height = `0px`;
+          newD.style.fontSize = `14px`;
+          newD.style.transform = `scale(${1})`;
+          newD.innerText = this.word[random(this.word.length)];
+          section.appendChild(newD);
+        },
+        //定时器
+        interval() {
+          this.value.intervalId = setInterval(() => {
+            this.isTimeCre() ? this.cre() : "";
+            this.scale();
+            this.rm();
+          }, this.value.scaleSpeed);
+        }
+      };
+      //页面渲染结束时调用方法
+      window.onload = function() {
+        obj.init();
+      };
+    </script>
+  </body>
+</html>
