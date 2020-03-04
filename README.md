@@ -15,3 +15,5 @@ Whenever I think of something interesting, I'll try coding.
 这个仓库就是一个杂物箱，没什么重要内容，但就是需要它来存点东西
 <br>
 This warehouse is just a glove box. It doesn't have any important content, but it is needed to store something.
+
+简单说就是练手而已 :)
