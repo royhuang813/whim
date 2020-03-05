@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <title>Document</title>
+        <style>
+            #container {
+                position: relative;
+                margin: 0 50px;
+                width: 1300px;
+                height: 500px;
+                border: 1px solid;
+            }
+            #circle {
+                position: absolute;
+                top: 0;
+                left: 1000px;
+                width: 300px;
+                height: 300px;
+                background-image: url("./FirestoneAS.png");
+                background-size: 100%;
+                border-radius: 100%;
+                transform: rotateZ(45deg);
+            }
+        </style>
+    </head>
+    <body>
+        <div id="container">
+            <div id="circle"></div>
+        </div>
+        <script>
+            let obj = {
+                value: {
+                    pix: 0,
+                    leftP: 0,
+                    rightP: 1000,
+                    direction: "tR"
+                },
+                init: function() {
+                    let { pix, direction } = this.value;
+                    this.interval(pix, direction);
+                },
+                rotateZ: function() {
+                    circle.style.transform = `rotateZ(${this.value.pix}deg)`;
+                },
+                translate: function() {
+                    circle.style.left = `${this.value.pix}px`;
+                },
+                lOr: function() {
+                    let { pix, leftP, rightP, direction } = this.value;
+                    if (pix === 0) {
+                        this.value.direction = "tR";
+                    }
+                    if (pix === 1000) {
+                        this.value.direction = "tL";
+                    }
+                    if (pix >= leftP && this.value.direction === "tR") {
+                        this.value.pix++;
+                        this.value.direction = "tR";
+                    } else if (pix <= rightP && direction === "tL") {
+                        this.value.pix--;
+                        direction = "tL";
+                    }
+                },
+                interval: function(v, direction) {
+                    setInterval(() => {
+                        this.lOr();
+                        this.translate();
+                        this.rotateZ();
+                    }, 1);
+                }
+            };
+            window.onload = function() {
+                obj.init();
+            };
+        </script>
+    </body>
+</html>
