@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .line {
+        position: relative;
+        margin: 20px;
+        width: 110px;
+        height: 110px;
+        border: 4px solid;
+        border-radius: 50%;
+        border-color: transparent transparent transparent palevioletred;
+        background-color: #fff;
+        box-shadow: 0 0 4px 4px #00000030;
+        cursor: pointer;
+      }
+      .disk-name {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        margin: auto;
+        width: 100px;
+        height: 100px;
+        color: #fff;
+        font-size: 14px;
+        text-align: center;
+        line-height: 100px;
+        border-radius: 50%;
+        background-color: cadetblue;
+      }
+      #audio:focus {
+        outline: none;
+      }
+      .dark {
+        position: absolute;
+        top: 50px;
+        right: 500px;
+        color: #353535;
+        font-weight: bold;
+      }
+      #switch {
+        position: relative;
+        display: inline-block;
+        padding: 4px 10px;
+        color: #fff;
+        border-radius: 20px;
+        box-shadow: 0 0 2px 0 #00000050;
+        cursor: default;
+        background-color: #f0f0f0;
+      }
+      #switch::after {
+        content: "开 关";
+      }
+      #actionBar {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        margin: auto 0;
+        width: 26px;
+        height: 26px;
+        box-shadow: 0 0 6px 0 #00000030;
+        background-color: #fff;
+        border-radius: 50%;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div id="disk" class="line" style="transform: rotateZ(0);">
+        <span class="disk-name">梦飞船-不值得</span>
+      </div>
+      <audio id="audio" src="./梦飞船 - 不值得.mp3" controls></audio>
+      <div class="dark">
+        <p>暗黑模式</p>
+        <div id="switch">
+          <div id="actionBar" style="left: 2px;"></div>
+        </div>
+      </div>
+    </div>
+    <script>
+      document.onselectstart = function() {
+        return false;
+      };
+      let obj = {
+        element: {
+          disk: document.getElementById("disk"),
+          audio: document.getElementById("audio"),
+          switch: document.getElementById("switch"),
+          actionBar: document.getElementById("actionBar"),
+          body: document.getElementsByTagName("body")[0]
+        },
+        value: {
+          isStart: false,
+          angle: 0,
+          time: 20,
+          keep: null
+        },
+        init() {
+          this.clickDisk(this.element.disk);
+          this.clickAudio(this.element.audio);
+          this.clickActionBar(this.element.actionBar, this.element.switch, this.element.body);
+        },
+        clickActionBar(actionBar, switchDiv, body) {
+          actionBar.addEventListener("click", () => {
+            if (actionBar.style.left) {
+              actionBar.style.left = "";
+              actionBar.style.right = "2px";
+              switchDiv.style.backgroundColor = "#2bb512";
+              body.style.backgroundColor = "#aaa";
+            } else {
+              actionBar.style.right = "";
+              actionBar.style.left = "2px";
+              switchDiv.style.backgroundColor = "";
+              body.style.backgroundColor = "#fff";
+            }
+          });
+        },
+        clickAudio(element) {
+          element.addEventListener("play", () => {
+            clearInterval(this.value.keep);
+            this.keepDoIt();
+            this.playAudio();
+          });
+          element.addEventListener("pause", () => {
+            clearInterval(this.value.keep);
+            this.value.isStart = false;
+          });
+        },
+        clickDisk(element) {
+          element.addEventListener("click", () => {
+            if (this.value.isStart) {
+              clearInterval(this.value.keep);
+              this.value.isStart = false;
+              this.pauseAudio();
+            } else {
+              this.keepDoIt();
+              this.playAudio();
+            }
+          });
+        },
+        playAudio() {
+          this.element.audio.play();
+        },
+        pauseAudio() {
+          this.element.audio.pause();
+        },
+        animate(element) {
+          if (this.value.angle <= 360) {
+            this.value.angle++;
+          } else {
+            this.value.angle = 0;
+          }
+          element.style.transform = `rotateZ(${this.value.angle}deg)`;
+        },
+        keepDoIt() {
+          this.value.isStart = true;
+          this.value.keep = setInterval(() => {
+            this.animate(this.element.disk, this.value.angle);
+          }, this.value.time);
+        }
+      };
+
+      window.onload = () => {
+        obj.init();
+      };
+    </script>
+  </body>
+</html>
